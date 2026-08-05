@@ -1,0 +1,68 @@
+{% extends 'blog/base.html' %}
+{% block title %}My Posts – NUB Journal{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-9 mx-auto">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h4 class="fw-semibold mb-0">My Posts</h4>
+      <a href="{% url 'post_create' %}" class="btn btn-dark btn-sm">+ New Post</a>
+    </div>
+
+    {% if posts %}
+    <div class="table-responsive">
+      <table class="table table-bordered table-hover bg-white align-middle">
+        <thead class="table-dark">
+          <tr>
+            <th>Title</th>
+            <th>Status</th>
+            <th>Created</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for post in posts %}
+          <tr>
+            <td>
+              {% if post.status == 'published' %}
+                <a href="{% url 'post_detail' post.slug %}" class="text-decoration-none">{{ post.title }}</a>
+              {% else %}
+                {{ post.title }}
+              {% endif %}
+            </td>
+            <td>
+              {% if post.status == 'published' %}
+                <span class="badge bg-success">Published</span>
+              {% else %}
+                <span class="badge bg-secondary">Draft</span>
+              {% endif %}
+            </td>
+            <td><small>{{ post.created_at|date:"d M Y" }}</small></td>
+            <td>
+              <a href="{% url 'post_edit' post.pk %}" class="btn btn-sm btn-outline-primary">Edit</a>
+
+              <form method="post" action="{% url 'post_toggle' post.pk %}" class="d-inline">
+                {% csrf_token %}
+                {% if post.status == 'draft' %}
+                  <button type="submit" class="btn btn-sm btn-outline-success">Publish</button>
+                {% else %}
+                  <button type="submit" class="btn btn-sm btn-outline-warning">Unpublish</button>
+                {% endif %}
+              </form>
+
+              <a href="{% url 'post_delete' post.pk %}" class="btn btn-sm btn-outline-danger">Delete</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+      <div class="text-center text-muted py-5">
+        <p>You have no posts yet.</p>
+        <a href="{% url 'post_create' %}" class="btn btn-dark btn-sm">Write your first post</a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
